@@ -1,20 +1,15 @@
 const express = require("express");
 let router = express.Router();
-const validateProduct = require("../../middlewares/validateProduct");
 const auth = require("../../middlewares/auth");
 const admin = require("../../middlewares/admin");
+const validateProduct = require("../../middlewares/validateProduct");
 var { Product } = require("../../models/product");
 //get products
 router.get("/", async (req, res) => {
-  console.log(req.user);
-  let page = Number(req.query.page ? req.query.page : 1);
-  let perPage = Number(req.query.perPage ? req.query.perPage : 10);
-  let skipRecords = perPage * (page - 1);
-  let products = await Product.find().skip(skipRecords).limit(perPage);
-  let total = await Product.countDocuments();
-  return res.send({ total, products });
+  let products = await Product.find();
+  return res.send(products);
 });
-//get single products
+
 router.get("/:id", async (req, res) => {
   try {
     let product = await Product.findById(req.params.id);
@@ -26,23 +21,16 @@ router.get("/:id", async (req, res) => {
   }
 });
 //update a record
-router.put("/:id", validateProduct, auth, admin, async (req, res) => {
-  let product = await Product.findById(req.params.id);
-  product.name = req.body.name;
-  product.price = req.body.price;
-  await product.save();
-  return res.send(product);
-});
+
 //update a record
-router.delete("/:id", auth, admin, async (req, res) => {
-  let product = await Product.findByIdAndDelete(req.params.id);
-  return res.send(product);
-});
+
 //Insert a record
-router.post("/", validateProduct, auth, async (req, res) => {
+router.post("/", validateProduct, async (req, res) => {
   let product = new Product();
-  product.name = req.body.name;
-  product.price = req.body.price;
+  product.teamOne = req.body.teamOne;
+  product.teamTwo = req.body.teamTwo;
+  product.date = req.body.date;
+  product.city = req.body.city;
   await product.save();
   return res.send(product);
 });

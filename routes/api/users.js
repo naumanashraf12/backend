@@ -1,10 +1,10 @@
 const express = require("express");
+var bcrypt = require("bcryptjs");
+const config = require("config");
+const jwt = require("jsonwebtoken");
+const _ = require("lodash");
 let router = express.Router();
 let { User } = require("../../models/user");
-var bcrypt = require("bcryptjs");
-const _ = require("lodash");
-const jwt = require("jsonwebtoken");
-const config = require("config");
 router.post("/register", async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   if (user) return res.status(400).send("User with given Email already exist");
@@ -18,12 +18,12 @@ router.post("/register", async (req, res) => {
     { _id: user._id, name: user.name, role: user.role },
     config.get("jwtPrivateKey")
   );
-  let datatoRetuen = {
+  let datatoReturn = {
     name: user.name,
     email: user.email,
     token: user.token,
   };
-  return res.send(datatoRetuen);
+  return res.send(datatoReturn);
 });
 router.post("/login", async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
@@ -36,4 +36,5 @@ router.post("/login", async (req, res) => {
   );
   res.send(token);
 });
+
 module.exports = router;
